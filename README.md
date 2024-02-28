@@ -6,7 +6,7 @@
 
 [![Huggingface Models](https://img.shields.io/badge/Models-Huggingface%20Models-bron)](https://huggingface.co/L4NLP)
 [![Data](https://img.shields.io/badge/Data-Long%20Dialogues-light)](https://huggingface.co/datasets/L4NLP/chunkllama-long-dialog)
-[![Paper](https://img.shields.io/badge/Paper-Arvix%20Link-green)](https://arxiv.org/)
+[![Paper](https://img.shields.io/badge/Paper-Arvix%20Link-green)](https://arxiv.org/abs/2402.17463)
 
 
 ###  Overview
