@@ -19,7 +19,7 @@ As a training-free method, only one line needs to be added to your original infe
 ```bash
 replace_with_chunkllama(pretraining_length=4096)
 ```
-##### Full inference code
+#### Full inference code
 ```bash
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from chunkllama_attn_replace import replace_with_chunkllama
@@ -32,7 +32,7 @@ inputs = tokenizer("Long...docs\n Q: How to extend the context window of LLMs? "
 output_ids = model.generate(**inputs, max_length=128)[0]
 print(tokenizer.decode(output_ids))
 ```
-##### Chat with a lengthy PDF file
+#### Chat with a lengthy PDF file
 We provide many popular papers about long-context scaling of LLMs in [Popular_PDFs]() folder. You can set the param `--pdf` and get the recent advance in this field via ChunkLlama!
 <p align = "center">
 <img src="fig/sample_chain.gif" width="95%" alt="examples"  align=center loop=infinite/>
