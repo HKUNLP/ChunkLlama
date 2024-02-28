@@ -1,7 +1,8 @@
-# Training-Free Long-Context Scaling of Large Language Models
 <p align="center" width="100%">
-<img src="fig/Chunkllama.png" alt="chunkllama" style="width: 100%; min-width: 300px; display: block; margin: auto;">
+<img src="fig/Chunkllama.png" alt="chunkllama" style="width: 90%; min-width: 300px; display: block; margin: auto;">
 </p>
+
+# Training-Free Long-Context Scaling of Large Language Models
 
 [![Huggingface Models](https://img.shields.io/badge/Models-Huggingface%20Models-bron)](https://huggingface.co/L4NLP)
 [![Data](https://img.shields.io/badge/Data-Long%20Dialogues-light)](https://huggingface.co/datasets/L4NLP/chunkllama-long-dialog)
