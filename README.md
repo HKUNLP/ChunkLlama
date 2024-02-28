@@ -33,7 +33,7 @@ output_ids = model.generate(**inputs, max_length=128)[0]
 print(tokenizer.decode(output_ids))
 ```
 #### Chat with a lengthy PDF file
-We provide many popular papers about long-context scaling of LLMs in [Popular_PDFs](https://github.com/HKUNLP/ChunkLlama/tree/main/Popular_PDFs) folder. You can set the param `--pdf` and get the recent advance in this field via ChunkLlama!
+We have provided a collection of influential papers on long-context scaling of LLMs in the `Popular_PDFs` directory. By using the `--pdf` parameter, you can access the latest advancements in this field through ChunkLlama⭐.
 <p align = "center">
 <img src="fig/sample_chain.gif" width="95%" alt="examples"  align=center loop=infinite/>
 </p>
