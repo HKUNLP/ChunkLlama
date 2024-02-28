@@ -33,7 +33,7 @@ output_ids = model.generate(**inputs, max_length=128)[0]
 print(tokenizer.decode(output_ids))
 ```
 #### Chat with a lengthy PDF file
-We provide many popular papers about long-context scaling of LLMs in [Popular_PDFs]() folder. You can set the param `--pdf` and get the recent advance in this field via ChunkLlama!
+We provide many popular papers about long-context scaling of LLMs in [Popular_PDFs](https://github.com/HKUNLP/ChunkLlama/tree/main/Popular_PDFs) folder. You can set the param `--pdf` and get the recent advance in this field via ChunkLlama!
 <p align = "center">
 <img src="fig/sample_chain.gif" width="95%" alt="examples"  align=center loop=infinite/>
 </p>
@@ -74,7 +74,7 @@ python run_chunkllama_100k.py --pdf Popular_PDFs/longlora.pdf --scale 13b
 
 📌 Notice: We have found that although 7B models can achieve low perplexity on long contexts, they often make mistakes in practical tasks, including those with fine-tuned versions. Therefore, we recommend using the larger 13B (ChunkLlama-13b, Chunk-Vicuna-13b) or 70B (ChunkLlama-70B) models for higher accuracy.
 ### Fine-tuning
-ChunkLlama can be further improved by fine-tuning on long conversations. We further train ChunkLlama on with a context window of 16k on concatenated dialogues from previous SFT dataset ShareGPT and AlpacaGPT4. 
+ChunkLlama can be further improved by fine-tuning on long conversations. We further train ChunkLlama on with a context window of 16k on concatenated dialogues from the previous SFT datasets ShareGPT and AlpacaGPT4. 
 The data we use is available [here](https://huggingface.co/datasets/L4NLP/chunkllama-long-dialog)
 
 ```bash
