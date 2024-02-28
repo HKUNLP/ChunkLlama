@@ -69,7 +69,7 @@ We provide three examples of how to employ DCA on popular LLMs in `run_chunkllam
 
 Run the demo:
 ```python
-python run_chunkllama_100k.py --pdf Popular_PDFs/longlora.pdf --scale 13b
+python run_chunkllama_100k.py --pdf Popular_PDFs/longlora.pdf --scale 13b (7b/13b/70b)
 ```
 
 📌 Notice: We have found that although 7B models can achieve low perplexity on long contexts, they often make mistakes in practical tasks, including those with fine-tuned versions. Therefore, we recommend using the larger 13B (ChunkLlama-13b, Chunk-Vicuna-13b) or 70B (ChunkLlama-70B) models for higher accuracy.
@@ -117,7 +117,7 @@ This section contains the data and code for validating ChunkLlama on different t
 
 ```bash
 cd ppl
-python test_ppl.py --seq_len 16384 --scale 7b (13b/70b) 
+python test_ppl.py --seq_len 16384 --scale 13b (7b/13b/70b)
 ```
 where `--seq_len 16384` denotes the length of input prompts. We use tokenized the tokenized validation  split of PG19 provided by [longlora](https://github.com/dvlab-research/LongLoRA). The data is stored in `ppl/data/pg19.validation.bin`.
 
