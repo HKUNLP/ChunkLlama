@@ -61,7 +61,7 @@ pip install flash-attn --no-build-isolation (FlashAttention >= 2.0.1)
 | [Llama-2-70b-chat-hf (4k)](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)   |     128k     |
 | [Vicuna-1.5-7b-16k](https://huggingface.co/lmsys/vicuna-7b-v1.5-16k)                |     200k     |
 | [Vicuna-1.5-13b-16k](https://huggingface.co/lmsys/vicuna-13b-v1.5-16k)              |     200k     |
-| [Mixtral 8x7b](https://huggingface.co/Qwen/Qwen1.5-14B-Chat)                        |     todo     |
+| [Mixtral 8x7b](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1)        |     todo     |
 | [Qwen1.5](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) 中文                        |     todo     |
 | [ChunkLlama-sft-7b-16k (ours)](https://huggingface.co/L4NLP/todo)                   |     200k     |
 | [ChunkLlama-sft-13b-16k (ours)](https://huggingface.co/L4NLP/todo)                  |     200k     |
