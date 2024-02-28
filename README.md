@@ -165,7 +165,16 @@ We sincerely appreciate the assistance provided by the following people (works) 
 - We thank [Hang Yan](https://scholar.google.com/citations?user=yigHzW8AAAAJ&hl=en) for his valuable comments on this work.
 
 ### Citation
-
+```
+@misc{an2024trainingfree,
+      title={Training-Free Long-Context Scaling of Large Language Models}, 
+      author={Chenxin An and Fei Huang and Jun Zhang and Shansan Gong and Xipeng Qiu and Chang Zhou and Lingpeng Kong},
+      year={2024},
+      eprint={2402.17463},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
 
 ## License
 - ChunkLlama is licensed under the Apache License 2.0. This means that it requires the preservation of copyright and license notices. 
