@@ -160,7 +160,7 @@ python Evaluation/auto_eval.py --pred_file Predictions/Chunkllama-13b16k/courser
 We sincerely appreciate the assistance provided by the following people (works) for ChunkLlama:
 - We gain useful background and insights from [Jianlin Su](https://github.com/bojone)'s [blogs](https://kexue.fm/). We recommend interested researchers to read his blogs to get a better understanding of the long-context scaling of LLMs.
 - This work is built upon the [LLaMA2](https://ai.meta.com/llama) as the pre-trained models. We also use [Vicuna](https://github.com/lm-sys/FastChat), [Together's Llama2 fork](https://huggingface.co/togethercomputer/LLaMA-2-7B-32K), and [CodeLlama](https://huggingface.co/codellama/).
-- We use the code from [LongChat](https://github.com/DachengLi1/LongChat) for the finetuning process and code from [longlora](https://github.com/dvlab-research/LongLoRA) for validation our method.
+- We use the code from [LongChat](https://github.com/DachengLi1/LongChat) for the finetuning process and code from [longlora](https://github.com/dvlab-research/LongLoRA) for validating our method.
 - We thank [Yukang Chen](https://github.com/yukang2017) for his help and valuable discussions.
 - We thank [Hang Yan](https://scholar.google.com/citations?user=yigHzW8AAAAJ&hl=en) for his valuable comments on this work.
 
