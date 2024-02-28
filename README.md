@@ -65,7 +65,7 @@ pip install flash-attn --no-build-isolation (FlashAttention >= 2.0.1)
 | [ChunkLlama-sft-13b-16k (ours)](https://huggingface.co/L4NLP/todo)                  |     200k     |
 
 3. Deploy your own demo.
-We provide three examples to show how employ DCA on popular LLMs `run_chunkllama_100k.py`, `run_together_200k.py` and `run_vicuna_200k.py`.
+We provide three examples of how to employ DCA on popular LLMs in `run_chunkllama_100k.py`, `run_together_200k.py` and `run_vicuna_200k.py`.
 
 Run the demo:
 ```python
@@ -108,7 +108,7 @@ python -m torch.distributed.run --nproc_per_node=8 \
         --lazy_preprocess True \
         --pretraining_length 4096
 ```
-You can change `--model_name_or_path`, `--output_dir` to your own directory. In our experiments, we directly train the chat version of Llama2, you can also use the base version of Llama2.
+You can change `--model_name_or_path`, `--output_dir` to your own directory. In our experiments, we directly train the chat version of Llama2, you can also use its base version.
 
 
 ### Experiments 
@@ -130,7 +130,7 @@ python test_passkey.py --seq_len 16384 --scale 13b (7b/13b/70b)
 
 
 #### Few-shot Learning
-The experimental settings of few-shot learning is the same with that in Llama2 Long. We use 4 popular long-context benchmarks: [NarrativeQA](https://github.com/google-deepmind/narrativeqa), [QMSum](https://github.com/Yale-LILY/QMSum), [Qasper](https://github.com/allenai/qasper-led-baseline), and [Quality](https://github.com/nyu-mll/quality).
+The experimental settings of few-shot learning are the same as that in Llama2 Long. We use 4 popular long-context benchmarks: [NarrativeQA](https://github.com/google-deepmind/narrativeqa), [QMSum](https://github.com/Yale-LILY/QMSum), [Qasper](https://github.com/allenai/qasper-led-baseline), and [Quality](https://github.com/nyu-mll/quality).
 We also release the data together with in-context examples in [few-shot-data](https://drive.google.com/file/d/1Cs6MkSFsE2SQi9SUOE5mmyLyxPWef3bL/view?usp=sharing). We report the results on their validation sets. The in-context examples are randomly selected from the training set.
 ```bash
 cd few-shot
@@ -145,7 +145,7 @@ python auto_eval.py   --dataset_name quality  --metrics_output_dir ./  --predict
 ```
 
 #### Zero-shot Learning
-We also test our method on chat version of Llama2 on zero-shot learning tasks.
+We also test our method on the chat version of Llama2 on zero-shot learning tasks.
 Considering the challenges of fair evaluation on open-ended tasks. We select 4 closed-ended tasks from [L-Eval](https://github.com/OpenLMLab/LEval/) with diverse input lengths ranging from 3k to 27 tokens.
 ```bash
 cd zero-shot
