@@ -1,0 +1,6 @@
+transformers==4.34.0
+torch>=2.0.0
+sentencepiece>=0.1.99
+tokenizers>=0.14.0
+accelerate>=0.23.0
+datasets>=2.14.5
