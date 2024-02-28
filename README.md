@@ -12,7 +12,7 @@
 ###  Overview
 Dual chunk attention is a training-free and effective method for extending the context window of large language models (LLMs) to more than 8x times their original pre-training length. We refer to the Llama-based model with dual chunk attention as ChunkLlama. DCA can be seamlessly integrated with (1) popular extrapolation methods such as [Positional Interpolation (PI)](https://arxiv.org/abs/2306.15595) and [NTK-Aware RoPE](https://github.com/huggingface/text-generation-inference/issues/512); and (2) widely-used libraries for memory-efficient inference like [FlashAttention](https://github.com/Dao-AILab/flash-attention) and [vLLM](https://github.com/vllm-project/vllm).
 
-Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to Llama2 70B, the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
+Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
