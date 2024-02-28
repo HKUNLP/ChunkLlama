@@ -125,7 +125,7 @@ where `--seq_len 16384` denotes the length of input prompts. We use tokenized th
 We provide a manner to test the passkey retrieval accuracy. For example,
 ```bash
 cd passkey
-python test_passkey.py --seq_len 16384 --scale 7b (13b/70b)
+python test_passkey.py --seq_len 16384 --scale 13b (7b/13b/70b)
 ```
 
 
