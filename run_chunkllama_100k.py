@@ -2,7 +2,7 @@
 try:
     import fitz  # PyMuPDF
 except ImportError:
-    print("run: pip install MyMuPDF")
+    print("run: pip install PyMuPDF")
 
 import os
 
@@ -77,13 +77,13 @@ B_SYS, E_SYS = "<<SYS>>\n", "\n<</SYS>>\n\n"
 for i in range(100):
     question = input("User: ")
     message = B_INST + B_SYS + sys_prompt + E_SYS + content + f"Question:\n{question}" + E_INST + "Answer:\n"
-    
+
     prompt_length = tokenizer(message, return_tensors="pt").input_ids.size()[-1]
     if prompt_length > args.max_length:
         print("="*20)
         print(f"Your input length is {prompt_length}, and it will be truncated to {args.max_length}. You can set `--max_length` to a larger value ")
         print("="*20)
-    
+
     inputs = tokenizer(message, truncation=True, return_tensors="pt").to(model.device)
     inp_length = inputs.input_ids.size()[-1]
     sample = model.generate(**inputs, do_sample=False, max_new_tokens=32)
