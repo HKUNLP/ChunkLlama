@@ -2,7 +2,7 @@
 try:
     import fitz  # PyMuPDF
 except ImportError:
-    print("run: pip install MyMuPDF")
+    print("run: pip install PyMuPDF")
 
 import os
 
