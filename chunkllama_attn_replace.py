@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 
 from torch import nn
 import math
-from transformers.models.llama.modeling_llama import rotate_half
+from transformers.models.llama.modeling_llama import rotate_half, repeat_kv
 import torch
 import transformers
 from flash_attn.flash_attn_interface import flash_attn_qkvpacked_func, flash_attn_func
@@ -178,6 +178,9 @@ def forward(
 
         attn_output = merge_attn_outputs(flash_results)
     else:
+        key_states = repeat_kv(key_states, self.num_key_value_groups)
+        value_states = repeat_kv(value_states, self.num_key_value_groups)
+        
         chunk_num_curr = (kv_seq_len - 1) // chunk_len
         q_states_intra = apply_rotary_pos_emb(query_states, q_cos, q_sin, position_ids)
         k_states_intra = key_states[:, :, chunk_len * chunk_num_curr:kv_seq_len, :]
