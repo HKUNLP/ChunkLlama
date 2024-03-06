@@ -15,7 +15,10 @@ def merge_attn_outputs(flash_results):
     flash_results = flash_results[1:]
     for flash_per_chunk in flash_results:
         attn_outputs = torch.stack([flash_attn_output[0] for flash_attn_output in flash_per_chunk])
-        lse_s = torch.exp(torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])).detach()
+        logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])
+        max_logits = torch.max(logits, dim=0).values  
+        stable_logits = logits - max_logits.unsqueeze(0)  
+        lse_s = torch.exp(stable_logits).detach()
         lse_sum = torch.sum(lse_s, dim=0)
         lse_s /= lse_sum
         attn_outputs *= lse_s.unsqueeze(-1)
