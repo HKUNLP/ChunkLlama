@@ -15,9 +15,9 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates 
-* 03/07/24 🚨Please **update the code** for function `merge_attn_outputs()`. We find a bug 🐞 when merging attention weights from different chunks. Sorry for the inconvenience. 
-* 03/08/24 Two key feautures of vLLM including Flash decoding (speed up the decoing) and Paged attention (better kv-cache management) are comming soon.
-* 
+*🚨🚨🚨 07/03/24 Please **update the code** for function `merge_attn_outputs()`. We find a bug 🐞 when merging attention weights from different chunks. Sorry for the inconvenience. 
+* 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoing) and Paged attention (better kv-cache management) are comming soon.
+  
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
 ```bash
