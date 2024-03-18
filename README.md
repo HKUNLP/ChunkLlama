@@ -75,7 +75,11 @@ We provide three examples of how to employ DCA on popular LLMs in `run_chunkllam
 
 Run the demo:
 ```python
-python run_chunkllama_100k.py --pdf Popular_PDFs/longlora.pdf --scale 13b (7b/13b/70b)
+python run_chunkllama_100k.py --pdf Popular_PDFs/longlora.pdf --scale 13b (7b/13b/70b) --max_length 16000
+```
+If you have `OOM` problems when dealing with longer input or larger models, we recommand use Tensor Parallel:
+```python
+deepspeed run_chunkllama_100k_ds.py --pdf Popular_PDFs/longlora.pdf --scale 13b (7b/13b/70b) --max_length 64000
 ```
 
 📌 Notice: We have found that although 7B models can achieve low perplexity on long contexts, they often make mistakes in practical tasks, including those with fine-tuned versions. Therefore, we recommend using the larger 13B (ChunkLlama-13b, Chunk-Vicuna-13b) or 70B (ChunkLlama-70B) models for higher accuracy.
