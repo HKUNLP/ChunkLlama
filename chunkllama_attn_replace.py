@@ -8,6 +8,7 @@ from transformers.models.llama.modeling_llama import rotate_half, repeat_kv
 import torch
 import transformers
 from flash_attn.flash_attn_interface import flash_attn_qkvpacked_func, flash_attn_func
+from transformers.cache_utils import Cache
 
 
 def merge_attn_outputs(flash_results):
@@ -15,9 +16,13 @@ def merge_attn_outputs(flash_results):
     flash_results = flash_results[1:]
     for flash_per_chunk in flash_results:
         attn_outputs = torch.stack([flash_attn_output[0] for flash_attn_output in flash_per_chunk])
+        # lse_s = torch.exp(torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])).detach()
+        # lse_sum = torch.sum(lse_s, dim=0)
+        # lse_s /= lse_sum
         logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])
         max_logits = torch.max(logits, dim=0).values  
         stable_logits = logits - max_logits.unsqueeze(0)  
+
         lse_s = torch.exp(stable_logits).detach()
         lse_sum = torch.sum(lse_s, dim=0)
         lse_s /= lse_sum
@@ -36,27 +41,29 @@ def do_flash_attn(query_states, key_states, value_states, causal=True):
 class ChunkLlamaRotaryEmbedding(nn.Module):
     def __init__(self, dim, max_position_embeddings=4096, base=10000, scaling_factor=1.0, device=None):
         super().__init__()
-        
-        self.max_seq_len = 16384
+
+        self.max_seq_len = max_position_embeddings
         self.dim = dim
-        self.max_length = None
         self.scaling_factor = scaling_factor
         self.max_position_embeddings = max_position_embeddings
         self.base = base
-        inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2).float().to(device) / self.dim))
-        self.register_buffer("inv_freq", inv_freq, persistent=False)
+        
 
         # Build here to make `torch.jit.trace` work.
         self._set_cos_sin_cache(
             seq_len=self.max_seq_len,
-            device=self.inv_freq.device, dtype=torch.get_default_dtype()
+            device=device, dtype=torch.float32
         )
 
     def _set_cos_sin_cache(self, seq_len, device, dtype):
+        inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2).float().to(device) / self.dim))
+        self.register_buffer("inv_freq", inv_freq, persistent=False)
+
         chunk_len = chunk_size - local_window
         q_t = torch.arange(chunk_len, device=device, dtype=self.inv_freq.dtype) / self.scaling_factor
-        qc_t = (q_t + chunk_len).clamp(max=chunk_size) / self.scaling_factor
-        k_t = (torch.arange(seq_len+MAX_NEW_TOKENS, device=device, dtype=self.inv_freq.dtype) % chunk_len) / self.scaling_factor
+        qc_t = (torch.arange(chunk_len, device=device, dtype=self.inv_freq.dtype) + chunk_len).clamp(max=chunk_size) / self.scaling_factor
+        k_t = (torch.arange(seq_len + MAX_NEW_TOKENS, device=device,
+                            dtype=self.inv_freq.dtype) % chunk_len) / self.scaling_factor
 
         q_freqs = torch.outer(q_t, self.inv_freq)  # seq_len x dim/2
         qc_freqs = torch.outer(qc_t, self.inv_freq)
@@ -78,7 +85,7 @@ class ChunkLlamaRotaryEmbedding(nn.Module):
         # no token will exceed chunk_size
         # chunk1_q,
         if seq_len > self.max_seq_len:
-            self._set_cos_sin_cache(seq_len=seq_len, device=self.inv_freq.device, dtype=torch.get_default_dtype())
+            self._set_cos_sin_cache(seq_len=seq_len, device=self.inv_freq.device, dtype=torch.float32)
             self.max_seq_len = seq_len
         return (
             self.q_cos_cached[:seq_len].to(dtype=x.dtype),
@@ -103,12 +110,12 @@ def apply_rotary_pos_emb(x, cos, sin, position_ids):
 def forward(
         self,
         hidden_states: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None,
+        attention_mask: Optional[torch.LongTensor] = None,
         position_ids: Optional[torch.LongTensor] = None,
-        past_key_value: Optional[Tuple[torch.Tensor]] = None,
+        past_key_value: Optional[Cache] = None,
         output_attentions: bool = False,
         use_cache: bool = False,
-        padding_mask: Optional[torch.LongTensor] = None,
+        **kwargs,
 ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
     bsz, q_len, _ = hidden_states.size()
     chunk_len = chunk_size - local_window
@@ -123,7 +130,7 @@ def forward(
     kv_seq_len = key_states.shape[-2]
     # during inference
     if past_key_value is not None:
-        kv_seq_len += past_key_value[0].shape[-2]
+        kv_seq_len += past_key_value.get_usable_length(kv_seq_len, self.layer_idx)
 
     q_seq_len = query_states.shape[-2]
     has_kv_cache = q_seq_len != kv_seq_len
@@ -134,11 +141,10 @@ def forward(
     position_ids = position_ids % chunk_len
 
     if past_key_value is not None:
-        # reuse k, v, self_attention
-        key_states = torch.cat([past_key_value[0], key_states], dim=2)
-        value_states = torch.cat([past_key_value[1], value_states], dim=2)
+        key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs=None)
 
-    past_key_value = (key_states, value_states) if use_cache else None
+    key_states = repeat_kv(key_states, self.num_key_value_groups)
+    value_states = repeat_kv(value_states, self.num_key_value_groups)
 
     flash_results = []
     if not has_kv_cache:
@@ -181,9 +187,6 @@ def forward(
 
         attn_output = merge_attn_outputs(flash_results)
     else:
-        key_states = repeat_kv(key_states, self.num_key_value_groups)
-        value_states = repeat_kv(value_states, self.num_key_value_groups)
-        
         chunk_num_curr = (kv_seq_len - 1) // chunk_len
         q_states_intra = apply_rotary_pos_emb(query_states, q_cos, q_sin, position_ids)
         k_states_intra = key_states[:, :, chunk_len * chunk_num_curr:kv_seq_len, :]
@@ -226,16 +229,6 @@ def forward(
     return attn_output, None, past_key_value
 
 
-def _prepare_decoder_attention_mask(self, attention_mask, input_shape,
-                                    inputs_embeds, past_key_values_length):
-    # [bsz, seq_len]
-    if input_shape[-1] > 1 and past_key_values_length == 0:  # encode
-        return attention_mask
-    return transformers.models.bart.modeling_bart.BartDecoder._prepare_decoder_attention_mask(self, attention_mask,
-                                                                                              input_shape,
-                                                                                              inputs_embeds,
-                                                                                              past_key_values_length)
-
 
 chunk_size = None
 local_window = None
@@ -248,6 +241,7 @@ def replace_with_chunkllama(pretraining_length=4096, local_window_size=None):
     chunk_size = pretraining_length * 3 // 4
     local_window = local_window_size if local_window_size else pretraining_length // 16
     transformers.models.llama.modeling_llama.LlamaAttention.forward = forward
+    transformers.models.llama.modeling_llama.LlamaFlashAttention2.forward = forward
     transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = ChunkLlamaRotaryEmbedding
     transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding = ChunkLlamaRotaryEmbedding
-    transformers.models.llama.modeling_llama.LlamaModel._prepare_decoder_attention_mask = _prepare_decoder_attention_mask
+
