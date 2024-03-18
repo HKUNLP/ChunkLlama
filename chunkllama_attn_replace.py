@@ -10,15 +10,19 @@ import transformers
 from flash_attn.flash_attn_interface import flash_attn_qkvpacked_func, flash_attn_func
 from transformers.cache_utils import Cache
 
+import math
+
+
+def get_mscale(scale=1):
+    if scale <= 1:
+        return 1.0
+    return 0.1 * math.log(scale) + 1.0
 
 def merge_attn_outputs(flash_results):
     attn_outputs_all = [flash_results[0][0]]
     flash_results = flash_results[1:]
     for flash_per_chunk in flash_results:
         attn_outputs = torch.stack([flash_attn_output[0] for flash_attn_output in flash_per_chunk])
-        # lse_s = torch.exp(torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])).detach()
-        # lse_sum = torch.sum(lse_s, dim=0)
-        # lse_s /= lse_sum
         logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])
         max_logits = torch.max(logits, dim=0).values  
         stable_logits = logits - max_logits.unsqueeze(0)  
@@ -56,12 +60,17 @@ class ChunkLlamaRotaryEmbedding(nn.Module):
         )
 
     def _set_cos_sin_cache(self, seq_len, device, dtype):
+        # yarn
+        scale = seq_len / self.max_position_embeddings
+        mscale = get_mscale(scale)
+        
         inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2).float().to(device) / self.dim))
         self.register_buffer("inv_freq", inv_freq, persistent=False)
 
         chunk_len = chunk_size - local_window
         q_t = torch.arange(chunk_len, device=device, dtype=self.inv_freq.dtype) / self.scaling_factor
-        qc_t = (torch.arange(chunk_len, device=device, dtype=self.inv_freq.dtype) + chunk_len).clamp(max=chunk_size) / self.scaling_factor
+        qc_t = (torch.arange(chunk_len, device=device, dtype=self.inv_freq.dtype) + chunk_len).clamp(
+            max=chunk_size) / self.scaling_factor
         k_t = (torch.arange(seq_len + MAX_NEW_TOKENS, device=device,
                             dtype=self.inv_freq.dtype) % chunk_len) / self.scaling_factor
 
@@ -73,12 +82,12 @@ class ChunkLlamaRotaryEmbedding(nn.Module):
         q_emb = torch.cat((q_freqs, q_freqs), dim=-1)  # seq_len x dim
         qc_emb = torch.cat((qc_freqs, qc_freqs), dim=-1)
         k_emb = torch.cat((k_freqs, k_freqs), dim=-1)  # seq_len x dim
-        self.register_buffer("q_cos_cached", q_emb.cos().to(dtype), persistent=False)
-        self.register_buffer("q_sin_cached", q_emb.sin().to(dtype), persistent=False)
-        self.register_buffer("qc_cos_cached", qc_emb.cos().to(dtype), persistent=False)
-        self.register_buffer("qc_sin_cached", qc_emb.sin().to(dtype), persistent=False)
-        self.register_buffer("k_cos_cached", k_emb.cos().to(dtype), persistent=False)
-        self.register_buffer("k_sin_cached", k_emb.sin().to(dtype), persistent=False)
+        self.register_buffer("q_cos_cached", q_emb.cos().to(dtype) * mscale, persistent=False)
+        self.register_buffer("q_sin_cached", q_emb.sin().to(dtype) * mscale, persistent=False)
+        self.register_buffer("qc_cos_cached", qc_emb.cos().to(dtype) * mscale, persistent=False)
+        self.register_buffer("qc_sin_cached", qc_emb.sin().to(dtype) * mscale, persistent=False)
+        self.register_buffer("k_cos_cached", k_emb.cos().to(dtype) * mscale, persistent=False)
+        self.register_buffer("k_sin_cached", k_emb.sin().to(dtype) * mscale, persistent=False)
 
     def forward(self, x, seq_len=None):
         # x: [bs, num_attention_heads, seq_len, head_size]
