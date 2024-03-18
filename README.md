@@ -15,8 +15,7 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates 
-* 🚨🚨🚨 07/03/24 Please **update the code** for function `merge_attn_outputs()`. We find a bug 🐞 when merging attention weights from different chunks. Sorry for the inconvenience. 
-* 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoing) and Paged attention (better kv-cache management) are comming soon.
+* 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoding) and Paged attention (better kv-cache management) are comming soon.
   
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
@@ -48,7 +47,7 @@ All of these papers are released recently and are impossible to be used during p
 1. Prepare the environment. 
 ```bash
 pip install -r requirements.txt
-pip install flash-attn --no-build-isolation (FlashAttention >= 2.0.1)
+pip install flash-attn --no-build-isolation (FlashAttention >= 2.5.0)
 ```
 2. Download the pretraining weights (Extended ctx means the context length enabled by DCA).
 
@@ -75,11 +74,11 @@ We provide three examples of how to employ DCA on popular LLMs in `run_chunkllam
 
 Run the demo:
 ```python
-python run_chunkllama_100k.py --pdf Popular_PDFs/longlora.pdf --scale 13b (7b/13b/70b) --max_length 16000
+python run_chunkllama_100k.py --max_length 16000 --scale 13b (7b/13b/70b) --pdf Popular_PDFs/longlora.pdf
 ```
-If you have `OOM` problems when dealing with longer input or larger models, we recommand use Tensor Parallel:
+If you have `OOM` problems when dealing with longer input or larger models, we recommend using Tensor Parallelism:
 ```python
-deepspeed run_chunkllama_100k_ds.py --pdf Popular_PDFs/longlora.pdf --scale 13b (7b/13b/70b) --max_length 64000
+deepspeed run_chunkllama_100k_ds.py --max_length 64000  --scale 13b (7b/13b/70b) --pdf Popular_PDFs/longlora.pdf
 ```
 
 📌 Notice: We have found that although 7B models can achieve low perplexity on long contexts, they often make mistakes in practical tasks, including those with fine-tuned versions. Therefore, we recommend using the larger 13B (ChunkLlama-13b, Chunk-Vicuna-13b) or 70B (ChunkLlama-70B) models for higher accuracy.
