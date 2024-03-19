@@ -14,7 +14,7 @@ from flash_attn_replace import replace_llama_attn_with_flash_attn
 
 def load_model():
     device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
-    model = LlamaForCausalLM.from_pretrained(model_path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(
+    model = LlamaForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", trust_remote_code=True, torch_dtype=torch.bfloat16).to(
         device)
     model = model.eval()
     return model
