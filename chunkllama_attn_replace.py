@@ -18,29 +18,6 @@ def get_mscale(scale=1):
         return 1.0
     return 0.1 * math.log(scale) + 1.0
 
-def merge_attn_outputs(flash_results):
-    attn_outputs_all = [flash_results[0][0]]
-    flash_results = flash_results[1:]
-    for flash_per_chunk in flash_results:
-        attn_outputs = torch.stack([flash_attn_output[0] for flash_attn_output in flash_per_chunk])
-        logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])
-        max_logits = torch.max(logits, dim=0).values  
-        stable_logits = logits - max_logits.unsqueeze(0)  
-
-        lse_s = torch.exp(stable_logits).detach()
-        lse_sum = torch.sum(lse_s, dim=0)
-        lse_s /= lse_sum
-        attn_outputs *= lse_s.unsqueeze(-1)
-        attn_outputs_all.append(attn_outputs.sum(dim=0))
-    return torch.cat(attn_outputs_all, dim=2)
-
-
-def do_flash_attn(query_states, key_states, value_states, causal=True):
-    # flash_attention
-    output, softmax_lse, _ = flash_attn_func(query_states.transpose(1, 2), key_states.transpose(1, 2),
-                                             value_states.transpose(1, 2), causal=causal, return_attn_probs=True)
-    return output.transpose(1, 2), softmax_lse
-
 
 class ChunkLlamaRotaryEmbedding(nn.Module):
     def __init__(self, dim, max_position_embeddings=4096, base=10000, scaling_factor=1.0, device=None):
@@ -60,7 +37,7 @@ class ChunkLlamaRotaryEmbedding(nn.Module):
         )
 
     def _set_cos_sin_cache(self, seq_len, device, dtype):
-        # yarn
+        # employing yarn will lead to better performance but results reported in our paper did not use yarn.
         scale = seq_len / self.max_position_embeddings
         mscale = get_mscale(scale)
         
@@ -114,6 +91,30 @@ def apply_rotary_pos_emb(x, cos, sin, position_ids):
     sin = sin[position_ids].unsqueeze(1)  # [bs, 1, seq_len, dim]
     x_emb = (x * cos) + (rotate_half(x) * sin)
     return x_emb
+
+
+def merge_attn_outputs(flash_results):
+    attn_outputs_all = [flash_results[0][0]]
+    flash_results = flash_results[1:]
+    for flash_per_chunk in flash_results:
+        attn_outputs = torch.stack([flash_attn_output[0] for flash_attn_output in flash_per_chunk])
+        logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])
+        max_logits = torch.max(logits, dim=0).values  
+        stable_logits = logits - max_logits.unsqueeze(0)  
+
+        lse_s = torch.exp(stable_logits).detach()
+        lse_sum = torch.sum(lse_s, dim=0)
+        lse_s /= lse_sum
+        attn_outputs *= lse_s.unsqueeze(-1)
+        attn_outputs_all.append(attn_outputs.sum(dim=0))
+    return torch.cat(attn_outputs_all, dim=2)
+
+
+def do_flash_attn(query_states, key_states, value_states, causal=True):
+    # flash_attention
+    output, softmax_lse, _ = flash_attn_func(query_states.transpose(1, 2), key_states.transpose(1, 2),
+                                             value_states.transpose(1, 2), causal=causal, return_attn_probs=True)
+    return output.transpose(1, 2), softmax_lse
 
 
 def forward(
