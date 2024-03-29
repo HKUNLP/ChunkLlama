@@ -30,7 +30,7 @@ from chunkllama_attn_replace import replace_with_chunkllama
 replace_with_chunkllama(pretraining_length=4096)
 
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf", trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", trust_remote_code=True, torch_dtype=torch.bfloat16)
+model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", attn_implementation="flash_attention_2", trust_remote_code=True, torch_dtype=torch.bfloat16)
 inputs = tokenizer("Long...docs\n Q: How to extend the context window of LLMs? ", return_tensors="pt")
 output_ids = model.generate(**inputs, max_length=128)[0]
 print(tokenizer.decode(output_ids))
