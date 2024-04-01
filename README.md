@@ -25,7 +25,14 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
 ```bash
 # `transformers==4.37.2`
-replace_with_chunkllama(pretraining_length=4096)
+from chunkllama_attn_replace import replace_with_chunkllama, replace_with_chunkMistral, replace_with_chunkMixtral
+from chunkqwen_attn_replace import replace_with_chunkqwen
+
+replace_with_chunkllama(pretraining_length=4096) # Llama2
+replace_with_chunkMistral(pretraining_length=32384) # Mistral-v0.2
+replace_with_chunkMixtral(pretraining_length=32384) # Mixtral MOE model
+replace_with_chunkMixtral(pretraining_length=32384) # Qwen 1.5
+
 ```
 #### Full inference code
 ```bash
