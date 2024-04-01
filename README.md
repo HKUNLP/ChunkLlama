@@ -15,11 +15,16 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates 
-* 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoding) and Paged attention (better kv-cache management) are comming soon.
-  
+* We add Mistral/Mixtral and Qwen1.5 which have 32k training contexts
+<p align="center" width="100%">
+<img src="fig/mistral.png" alt="mistral_chunk" style="width: 90%; min-width: 300px; display: block; margin: auto;">
+</p>
+* 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoding) and Paged attention (better kv-cache management) are comming soon
+
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
 ```bash
+# `transformers==4.37.2`
 replace_with_chunkllama(pretraining_length=4096)
 ```
 #### Full inference code
@@ -28,7 +33,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from chunkllama_attn_replace import replace_with_chunkllama
 ##### add this line #####
 replace_with_chunkllama(pretraining_length=4096)
-
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf", trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", attn_implementation="flash_attention_2", trust_remote_code=True, torch_dtype=torch.bfloat16)
 inputs = tokenizer("Long...docs\n Q: How to extend the context window of LLMs? ", return_tensors="pt")
@@ -64,8 +68,8 @@ pip install flash-attn --no-build-isolation (FlashAttention >= 2.5.0)
 | [Llama-2-70b-chat-hf (4k)](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf)   |     128k     |
 | [Vicuna-1.5-7b-16k](https://huggingface.co/lmsys/vicuna-7b-v1.5-16k)                |     200k     |
 | [Vicuna-1.5-13b-16k](https://huggingface.co/lmsys/vicuna-13b-v1.5-16k)              |     200k     |
-| [Mixtral 8x7b](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1)        |     todo     |
-| [Qwen1.5](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) 中文                        |     todo     |
+| [Mixtral 8x7b & Mistral 7b](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1)        |     200k+     |
+| [Qwen1.5](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) 中文                        |      200k     |
 | [ChunkLlama-sft-7b-16k (ours)](https://huggingface.co/L4NLP/todo)                   |     200k     |
 | [ChunkLlama-sft-13b-16k (ours)](https://huggingface.co/L4NLP/todo)                  |     200k     |
 
