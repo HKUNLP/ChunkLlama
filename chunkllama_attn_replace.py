@@ -255,3 +255,21 @@ def replace_with_chunkllama(pretraining_length=4096, local_window_size=None):
     transformers.models.llama.modeling_llama.LlamaRotaryEmbedding = ChunkLlamaRotaryEmbedding
     transformers.models.llama.modeling_llama.LlamaLinearScalingRotaryEmbedding = ChunkLlamaRotaryEmbedding
 
+def replace_with_chunkMistral(pretraining_length=32384, local_window_size=None):
+    global chunk_size
+    global local_window
+    chunk_size = pretraining_length * 3 // 4
+    local_window = local_window_size if local_window_size else pretraining_length // 16
+    transformers.models.mistral.modeling_mistral.MistralRotaryEmbedding = ChunkLlamaRotaryEmbedding
+    transformers.models.mistral.modeling_mistral.MistralAttention.forward = forward
+    transformers.models.mistral.modeling_mistral.MistralFlashAttention2.forward = forward
+
+def replace_with_chunkMixtral(pretraining_length=32384, local_window_size=None):
+    global chunk_size
+    global local_window
+    chunk_size = pretraining_length * 3 // 4
+    local_window = local_window_size if local_window_size else pretraining_length // 16
+    transformers.models.mixtral.modeling_mixtral.MixtralRotaryEmbedding = ChunkLlamaRotaryEmbedding
+    transformers.models.mixtral.modeling_mixtral.MixtralAttention.forward = forward
+    transformers.models.mixtral.modeling_mixtral.MixtralFlashAttention2.forward = forward
+
