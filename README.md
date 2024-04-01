@@ -77,8 +77,8 @@ pip install flash-attn --no-build-isolation (FlashAttention >= 2.5.0)
 | [Vicuna-1.5-13b-16k](https://huggingface.co/lmsys/vicuna-13b-v1.5-16k)              |     200k     |
 | [Mixtral 8x7b & Mistral 7b](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1)        |     200k+     |
 | [Qwen1.5](https://huggingface.co/Qwen/Qwen1.5-14B-Chat) 中文                        |      200k     |
-| [ChunkLlama-sft-7b-16k (ours)](https://huggingface.co/L4NLP/todo)                   |     200k     |
-| [ChunkLlama-sft-13b-16k (ours)](https://huggingface.co/L4NLP/todo)                  |     200k     |
+| [ChunkLlama-sft-7b-16k (ours)](https://huggingface.co/L4NLP/todo)                   |     100k     |
+| [ChunkLlama-sft-13b-16k (ours)](https://huggingface.co/L4NLP/todo)                  |     100k     |
 
 3. Deploy your own demo.
 We provide three examples of how to employ DCA on popular LLMs in `run_chunkllama_100k.py`, `run_together_200k.py` and `run_vicuna_200k.py`.
