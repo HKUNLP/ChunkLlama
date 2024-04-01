@@ -17,7 +17,7 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 ### Updates 
 * We add Mistral/Mixtral and Qwen1.5 which have 32k training contexts
 <p align="center" width="100%">
-<img src="fig/mistral.png" alt="mistral_chunk" style="width: 90%; min-width: 300px; display: block; margin: auto;">
+<img src="fig/merge_needle_mistral.png" alt="mistral_needle" style="width: 90%; min-width: 300px; display: block; margin: auto;">
 </p>
 * 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoding) and Paged attention (better kv-cache management) are comming soon
 
