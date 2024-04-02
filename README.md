@@ -148,6 +148,15 @@ cd passkey
 python test_passkey.py --seq_len 16384 --scale 13b (7b/13b/70b)
 ```
 
+#### Needle In A HayStack
+We provide a manner to test the passkey retrieval accuracy. For example,
+```bash
+cd need_in_a_haystack
+# the following command will generate a jsonl file
+python retrieve_needle.py --max_length 192k --scale 13b (7b/13b/70b) --model mistral
+# get the figure
+python draw.py 
+```
 
 #### Few-shot Learning
 The experimental settings of few-shot learning are the same as that in Llama2 Long. We use 4 popular long-context benchmarks: [NarrativeQA](https://github.com/google-deepmind/narrativeqa), [QMSum](https://github.com/Yale-LILY/QMSum), [Qasper](https://github.com/allenai/qasper-led-baseline), and [Quality](https://github.com/nyu-mll/quality).
