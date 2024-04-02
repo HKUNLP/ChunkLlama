@@ -8,7 +8,7 @@ import torch
 import argparse
 import random
 from numpy import random
-from chunkmistral_attn_replace import replace_with_chunkllama
+from chunkllama_attn_replace import replace_with_chunkmistral
 import json
 import pandas as pd
 import seaborn as sns
@@ -91,7 +91,7 @@ def parse_config():
 if __name__ == "__main__":
     args = parse_config()
     if args.dca:
-        replace_with_chunkllama(args.pretraining_length)
+        replace_with_chunkmistral(args.pretraining_length)
 
     output_name = f"{args.model}.output.jsonl"
     print("results will be save to:", output_name)
