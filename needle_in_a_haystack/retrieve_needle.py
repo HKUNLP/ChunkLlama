@@ -8,7 +8,7 @@ import torch
 import argparse
 import random
 from numpy import random
-from chunkllama_attn_replace import replace_with_chunkmistral
+from chunkllama_attn_replace import replace_with_chunkmistral, replace_with_chunkllama
 import json
 import pandas as pd
 import seaborn as sns
@@ -89,6 +89,8 @@ def parse_config():
 
 
 if __name__ == "__main__":
+    model_path = "/path/to/model"
+    
     args = parse_config()
     if args.dca:
         replace_with_chunkmistral(args.pretraining_length)
@@ -96,7 +98,6 @@ if __name__ == "__main__":
     output_name = f"{args.model}.output.jsonl"
     print("results will be save to:", output_name)
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-    
     model = load_model()
     
     # hyper params
