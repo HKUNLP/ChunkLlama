@@ -153,7 +153,7 @@ We provide a manner to test the passkey retrieval accuracy. For example,
 ```bash
 cd need_in_a_haystack
 # the following command will generate a jsonl file
-python retrieve_needle.py --max_length 192k --scale 13b (7b/13b/70b) --model mistral
+python retrieve_needle.py --max_length 192k --model mistral
 # get the figure
 python draw.py 
 ```
