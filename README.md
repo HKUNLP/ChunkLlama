@@ -24,6 +24,8 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 <p align="center" width="100%">
 <img src="fig/merge_needle_mistral.png" alt="mistral_needle" style="width: 90%; min-width: 300px; display: block; margin: auto;">
 </p>
+
+
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
 ```bash
@@ -35,12 +37,19 @@ replace_with_chunkllama(pretraining_length=4096) # Llama2
 replace_with_chunkmistral(pretraining_length=32384) # Mistral-v0.2
 replace_with_chunkmixtral(pretraining_length=32384) # Mixtral MOE model
 replace_with_chunkqwen(pretraining_length=32384) # Qwen 1.5
-
 ```
+We suggest using our *Flash Decoding version* for efficiency:
+```
+from flash_decoding_chunkllama import replace_with_chunkllama
+replace_with_chunkllama(pretraining_length=4096)
+```
+
+
 #### Full inference code
 ```bash
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from chunkllama_attn_replace import replace_with_chunkllama
+# or from flash_decoding_chunkllama  import replace_with_chunkllama
 ##### add this line #####
 replace_with_chunkllama(pretraining_length=4096)
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf", trust_remote_code=True)
