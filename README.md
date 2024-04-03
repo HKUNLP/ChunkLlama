@@ -15,12 +15,15 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates 
+* We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. Based on our experiments on Llama2 7b, a single A100 can support inference with KV cache at **90k** (50k->90k) input, and 8 A100s can support inputs over 400k tokens. We also provide the monkey patch for the standard Llama2 model [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
+<p align="center" width="100%">
+<img src="fig/memory.jpg" alt="mem" style="width: 40%; min-width: 100px; display: block; margin: auto;">
+</p>
+
 * We add Mistral/Mixtral and Qwen1.5 which have 32k training contexts
 <p align="center" width="100%">
 <img src="fig/merge_needle_mistral.png" alt="mistral_needle" style="width: 90%; min-width: 300px; display: block; margin: auto;">
 </p>
-* 08/03/24 Two key feautures of vLLM including Flash decoding (speed up the decoding) and Paged attention (better kv-cache management) are comming soon
-
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
 ```bash
