@@ -10,7 +10,7 @@ import argparse
 import torch
 from transformers import LlamaTokenizer, LlamaForCausalLM
 from chunkllama_attn_replace import replace_with_chunkllama
-from flash_attn_replace import replace_llama_attn_with_flash_attn
+# from flash_decoding_chunkllama import replace_with_chunkllama
 
 def load_model():
     if args.scale != "70b":
@@ -58,8 +58,8 @@ model_path = f"meta-llama/llama-2-{args.scale}-chat-hf"
 tokenizer = LlamaTokenizer.from_pretrained(model_path, model_max_length=args.max_length, truncation_side="left", trust_remote_code=True)
 # chunk attention
 replace_with_chunkllama(pretraining_length=4096)
-# original flash attention
-# replace_llama_attn_with_flash_attn()
+# flash decoding (suggested)
+# replace_with_chunkllama(pretraining_length=4096, max_prompt_length=args.max_length)
 model = load_model()
 sys_prompt, content = parse_pdf2text(args.pdf)
 
