@@ -20,7 +20,7 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 <img src="fig/memory.jpg" alt="mem" style="width: 40%; min-width: 100px; display: block; margin: auto;">
 </p>
 
-* We add Mistral/Mixtral and Qwen1.5 which have 32k training contexts
+* We add Mistral/Mixtral and Qwen which can be scaled to 200K+ contexts
 <p align="center" width="100%">
 <img src="fig/merge_needle_mistral.png" alt="mistral_needle" style="width: 90%; min-width: 300px; display: block; margin: auto;">
 </p>
