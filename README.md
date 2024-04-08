@@ -28,20 +28,22 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
-```bash
+```
 # `transformers==4.37.2`
-from chunkllama_attn_replace import replace_with_chunkllama, replace_with_chunkmistral, replace_with_chunkmixtral
+from chunkllama_attn_replace import replace_with_chunkllama 
+# flash decoding: from flash_decoding_chunkllama import replace_with_chunkllama
+
+# We suggest using our Flash Decoding version for efficiency:
+replace_with_chunkllama(pretraining_length=4096)
+```
+For other foundation models:
+```bash
+from chunkllama_attn_replace import replace_with_chunkmistral, replace_with_chunkmixtral
 from chunkqwen_attn_replace import replace_with_chunkqwen
 
-replace_with_chunkllama(pretraining_length=4096) # Llama2
 replace_with_chunkmistral(pretraining_length=32384) # Mistral-v0.2
 replace_with_chunkmixtral(pretraining_length=32384) # Mixtral MOE model
 replace_with_chunkqwen(pretraining_length=32384) # Qwen 1.5
-```
-We suggest using our *Flash Decoding version* for efficiency:
-```
-from flash_decoding_chunkllama import replace_with_chunkllama
-replace_with_chunkllama(pretraining_length=4096)
 ```
 
 
