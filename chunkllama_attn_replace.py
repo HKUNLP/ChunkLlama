@@ -16,7 +16,7 @@ import math
 def get_mscale(scale=1):
     if scale <= 1:
         return 1.0
-    return 0.1 * math.log(scale) + 1.0
+    return 0.05 * math.log(scale) + 1.0
 
 
 class ChunkLlamaRotaryEmbedding(nn.Module):
