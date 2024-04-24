@@ -158,9 +158,9 @@ This section contains the data and code for validating ChunkLlama on different t
 
 ```bash
 cd ppl
-python test_ppl.py --seq_len 16384 --scale 13b (7b/13b/70b)
+python test_ppl.py --seq_len 16384 --scale 13b (7b/13b/70b) --data_path pg19_llama3.validation.bin
 ```
-where `--seq_len 16384` denotes the length of input prompts. We use tokenized the tokenized validation  split of PG19 provided by [longlora](https://github.com/dvlab-research/LongLoRA). The data is stored in `ppl/data/pg19.validation.bin`.
+where `--seq_len 16384` denotes the length of input prompts. We use tokenized the tokenized validation  split of PG19 provided by [longlora](https://github.com/dvlab-research/LongLoRA). The raw data and tokenized data which can directly be loaded are available [here]().
 
 #### Passkey Retrieval
 We provide a manner to test the passkey retrieval accuracy. For example,
