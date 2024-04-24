@@ -41,7 +41,7 @@ As a training-free method, only one line needs to be added to your original infe
 # `transformers==4.37.2`
 from chunkllama_attn_replace import replace_with_chunkllama 
 # flash decoding: from flash_decoding_chunkllama import replace_with_chunkllama
-replace_with_chunkllama(pretraining_length=4096)
+replace_with_chunkllama(pretraining_length=4096) # pretraining_length=8192 if you are using Llama3
 ```
 For other foundation models:
 ```bash
