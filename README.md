@@ -26,12 +26,12 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. Based on our experiments on Llama2 7b, a single A100 can support inference with KV cache at **90k** (50k->90k) input, and 8 A100s can support inputs over 400k tokens. We also provide the monkey patch for the standard Llama2 model [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
 <p align="center" width="100%">
-<img src="fig/memory.jpg" alt="mem" style="width: 40%; min-width: 100px; display: block; margin: auto;">
+<img src="fig/memory.jpg" alt="mem" style="width: 35%; min-width: 100px; display: block; margin: auto;">
 </p>
 
 * We add Mistral/Mixtral and Qwen which can be scaled to 200K+ contexts
 <p align="center" width="100%">
-<img src="fig/merge_needle_mistral.png" alt="mistral_needle" style="width: 90%; min-width: 300px; display: block; margin: auto;">
+<img src="fig/merge_needle_mistral.png" alt="mistral_needle" style="width: 80%; min-width: 300px; display: block; margin: auto;">
 </p>
 
 
@@ -59,8 +59,10 @@ replace_with_chunkqwen(pretraining_length=32384) # Qwen 1.5
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from chunkllama_attn_replace import replace_with_chunkllama
 # or from flash_decoding_chunkllama  import replace_with_chunkllama
+
 ##### add this line #####
 replace_with_chunkllama(pretraining_length=4096)
+
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf", trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", attn_implementation="flash_attention_2", trust_remote_code=True, torch_dtype=torch.bfloat16)
 inputs = tokenizer("Long...docs\n Q: How to extend the context window of LLMs? ", return_tensors="pt")
