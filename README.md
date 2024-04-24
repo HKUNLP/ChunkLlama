@@ -14,7 +14,16 @@ Dual chunk attention is a training-free and effective method for extending the c
 
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
-### Updates 
+### Updates
+* We have added results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
+
+| Model | 4k | 8k | 16k | 32k | 64k | 96k | 128k | 160k | 192k |
+|--------|------|------|-------|-------|-------|-------|--------|--------|--------|
+| Llama3-8b  | 9.04 | 8.71 | 78.88 | >100 |  >100 |  >100 |  >100|  >100 |  >100 |
+| ChunkLlama3-8b | 9.04| 8.71 | 8.61 | 8.62 | 8.95 | 9.43 | 10.04 | 10.66 | 11.46 |
+| Llama3-70b | 5.36 | 5.16 | >100 | >100 |  >100 |  >100 |  >100 |  >100 |  >100 |
+| ChunkLlama3-70b | 5.36 | 5.16 | 5.14 | 5.14 | 5.21 | 5.32 | 5.40 | 5.45 | 5.46 |
+
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. Based on our experiments on Llama2 7b, a single A100 can support inference with KV cache at **90k** (50k->90k) input, and 8 A100s can support inputs over 400k tokens. We also provide the monkey patch for the standard Llama2 model [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
 <p align="center" width="100%">
 <img src="fig/memory.jpg" alt="mem" style="width: 40%; min-width: 100px; display: block; margin: auto;">
