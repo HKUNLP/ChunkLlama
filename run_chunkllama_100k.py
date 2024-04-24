@@ -8,7 +8,7 @@ import os
 
 import argparse
 import torch
-from transformers import LlamaTokenizer, LlamaForCausalLM
+from transformers import AutoTokenizer, LlamaForCausalLM
 from chunkllama_attn_replace import replace_with_chunkllama
 # from flash_decoding_chunkllama import replace_with_chunkllama
 
@@ -55,7 +55,7 @@ args = add_argument()
 
 model_path = f"meta-llama/llama-2-{args.scale}-chat-hf"
 
-tokenizer = LlamaTokenizer.from_pretrained(model_path, model_max_length=args.max_length, truncation_side="left", trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained(model_path, model_max_length=args.max_length, truncation_side="left", trust_remote_code=True)
 # chunk attention
 replace_with_chunkllama(pretraining_length=4096)
 # flash decoding (suggested)
