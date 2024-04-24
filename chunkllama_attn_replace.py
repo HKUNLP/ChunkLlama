@@ -242,7 +242,6 @@ def forward(
 
 chunk_size = None
 local_window = None
-linear_factor = None
 MAX_NEW_TOKENS = 512
 
 def replace_with_chunkllama(pretraining_length=4096, local_window_size=None):
