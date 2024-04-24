@@ -15,7 +15,7 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama2 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates
-* We have added results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
+* We add results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
 
 | Model | 4k | 8k | 16k | 32k | 64k | 96k | 128k | 160k | 192k |
 |--------|------|------|-------|-------|-------|-------|--------|--------|--------|
