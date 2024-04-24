@@ -92,20 +92,10 @@ if __name__ == '__main__':
         model = LlamaForCausalLM.from_pretrained(model_path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(
             device)
     else:
-        print("------------- pp ----------------")
-        from accelerate import init_empty_weights, load_checkpoint_and_dispatch
-
-        with init_empty_weights():
-            model = LlamaForCausalLM.from_pretrained(model_path,
-                                                     trust_remote_code=True, torch_dtype=torch.bfloat16)
-        model.tie_weights()
-        model = load_checkpoint_and_dispatch(model, checkpoint=model_path,
-                                             device_map='auto',
-                                             offload_folder="./offload",
-                                             no_split_module_classes=["LlamaDecoderLayer"],
-                                             offload_state_dict=True, dtype=torch.bfloat16)
+        model = LlamaForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", device_map="auto",
+                                                        trust_remote_code=True, torch_dtype=torch.bfloat16)
     data_path = args.data_path
-    data = {'val': np.memmap(data_path, dtype=np.uint16, mode='r')}
+    data = {'val': np.memmap(data_path, dtype=np.uint32, mode='r')}
 
     evaluate_ppl_all(seq_length=args.seq_len, sliding_window=256, args=args, model=model, data=data)
 
