@@ -24,6 +24,23 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 | Llama3-70b | 5.36 | 5.16 | >100 | >100 |  >100 |  >100 |  >100 |  >100 |  
 | ChunkLlama3-70b | 5.36 | 5.16 | 5.14 | 5.14 | 5.21 | 5.32 | 5.40 | 5.45 |
 
+Few-shot results on 4 research benchmarks:
+
+| Model | NarrativeQA(0-shot) | Qasper(2-shot) | QuALITY(2-shot) | QMSum(1-shot) |
+|--------|------|------|-------|-------|
+| ChunkLlama3-8b  | 27.4 | 30.5 | 52.6 | 15.4 | 
+| Llama2 Long-7b  | 21.9 | 27.8 | 43.2 | 14.9 | 
+| ChunkLlama3-70b | -- | -- | 75.4 | 16.0 | 
+| Llama2 Long-70b | 30.9 | 35.7 | 79.7 | 16.5 | 
+
+Zero-shot results (with Chat models) on L-Eval:
+
+| Model | TOEFL | QuALITY | Coursera | SFiction |
+|--------|------|------|-------|-------|
+| ChunkLlama3-8b  | 83.27 | 63.86 | 56.24 | 70.31 | 
+| ChunkLlama3-70b | **84.75** | **82.17** | **76.88** | **75.78** | 
+| GPT4-32k (2023) | 84.38 | 82.17 | 75.58 | 74.99 |
+
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. Based on our experiments on Llama2 7b, a single A100 can support inference with KV cache at **90k** (50k->90k) input, and 8 A100s can support inputs over 400k tokens. We also provide the monkey patch for the standard Llama2 model [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
 <p align="center" width="100%">
 <img src="fig/memory.jpg" alt="mem" style="width: 35%; min-width: 100px; display: block; margin: auto;">
