@@ -16,30 +16,12 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 
 ### Updates
 * We add results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
-
 | Model | 4k | 8k | 16k | 32k | 64k | 96k | 128k | 160k  |
 |--------|------|------|-------|-------|-------|-------|--------|--------|
-| Llama3-8b  | 9.04 | 8.71 | 78.88 | >100 |  >100 |  >100 |  >100|  >100 |
 | ChunkLlama3-8b | 9.04| 8.71 | 8.61 | 8.62 | 8.95 | 9.43 | 10.04 | 10.66 |
-| Llama3-70b | 5.36 | 5.16 | >100 | >100 |  >100 |  >100 |  >100 |  >100 |  
 | ChunkLlama3-70b | 5.36 | 5.16 | 5.14 | 5.14 | 5.21 | 5.32 | 5.40 | 5.45 |
 
-Few-shot results on 4 research benchmarks:
-
-| Model | NarrativeQA(0-shot) | Qasper(2-shot) | QuALITY(2-shot) | QMSum(1-shot) |
-|--------|------|------|-------|-------|
-| ChunkLlama3-8b  | 27.4 | 30.5 | 52.6 | 15.4 | 
-| Llama2 Long-7b  | 21.9 | 27.8 | 43.2 | 14.9 | 
-| ChunkLlama3-70b | -- | -- | 75.4 | 16.0 | 
-| Llama2 Long-70b | 30.9 | 35.7 | 79.7 | 16.5 | 
-
-Zero-shot results (with Chat models) on L-Eval:
-
-| Model | TOEFL | QuALITY | Coursera | SFiction |
-|--------|------|------|-------|-------|
-| ChunkLlama3-8b  | 83.27 | 63.86 | 56.24 | 70.31 | 
-| ChunkLlama3-70b | **84.75** | **82.17** | **76.88** | **75.78** | 
-| GPT4-32k (2023) | 84.38 | 82.17 | 75.58 | 74.99 |
+ChunkLlama3-8b achieves 100% retrieval accuracy across all document depths. Our few-shot results on the base model and zero-shot results on chat models show that ChunkLlama3-70b achieves performance on par with GPT-4 (2023/06/13) and Llama2 Long 70b.
 
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. Based on our experiments on Llama2 7b, a single A100 can support inference with KV cache at **90k** (50k->90k) input, and 8 A100s can support inputs over 400k tokens. We also provide the monkey patch for the standard Llama2 model [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
 <p align="center" width="100%">
@@ -227,6 +209,32 @@ The experimental settings and evaluation scripts are the same as those in the of
 ```bash
 python Evaluation/auto_eval.py --pred_file Predictions/Chunkllama-13b16k/coursera.jsonl 
 ```
+
+### ChunkLlama3
+
+| Model | 4k | 8k | 16k | 32k | 64k | 96k | 128k | 160k  |
+|--------|------|------|-------|-------|-------|-------|--------|--------|
+| Llama3-8b  | 9.04 | 8.71 | 78.88 | >100 |  >100 |  >100 |  >100|  >100 |
+| ChunkLlama3-8b | 9.04| 8.71 | 8.61 | 8.62 | 8.95 | 9.43 | 10.04 | 10.66 |
+| Llama3-70b | 5.36 | 5.16 | >100 | >100 |  >100 |  >100 |  >100 |  >100 |  
+| ChunkLlama3-70b | 5.36 | 5.16 | 5.14 | 5.14 | 5.21 | 5.32 | 5.40 | 5.45 |
+
+Few-shot results on 4 research benchmarks:
+
+| Model | NarrativeQA(0-shot) | Qasper(2-shot) | QuALITY(2-shot) | QMSum(1-shot) |
+|--------|------|------|-------|-------|
+| ChunkLlama3-8b  | 27.4 | 30.5 | 52.6 | 15.4 | 
+| Llama2 Long-7b  | 21.9 | 27.8 | 43.2 | 14.9 | 
+| ChunkLlama3-70b | -- | -- | 75.4 | 16.0 | 
+| Llama2 Long-70b | 30.9 | 35.7 | 79.7 | 16.5 | 
+
+Zero-shot results (with Chat models) on L-Eval:
+
+| Model | TOEFL | QuALITY | Coursera | SFiction |
+|--------|------|------|-------|-------|
+| ChunkLlama3-8b  | 83.27 | 63.86 | 56.24 | 70.31 | 
+| ChunkLlama3-70b | **84.75** | **82.17** | **76.88** | **75.78** | 
+| GPT4-32k (2023) | 84.38 | 82.17 | 75.58 | 74.99 |
 
 ### Acknowledgements
 We sincerely appreciate the assistance provided by the following people (works) for ChunkLlama:
