@@ -195,7 +195,8 @@ We provide a manner to test the passkey retrieval accuracy. For example,
 ```bash
 cd need_in_a_haystack
 # the following command will generate a jsonl file
-python retrieve_needle.py --max_length 192k --model mistral
+python retrieve_needle.py --max_length 192k --model mistral --pretraining_length 32384
+# for Llama: python retrieve_needle.py --max_length 192k --model Llama2 --pretraining_length 4096
 # get the figure
 python draw.py 
 ```
