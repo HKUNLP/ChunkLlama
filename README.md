@@ -16,12 +16,13 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 
 ### Updates
 * We add results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
+
 | Model | 4k | 8k | 16k | 32k | 64k | 96k | 128k | 160k  |
 |--------|------|------|-------|-------|-------|-------|--------|--------|
 | ChunkLlama3-8b | 9.04| 8.71 | 8.61 | 8.62 | 8.95 | 9.43 | 10.04 | 10.66 |
 | ChunkLlama3-70b | 5.36 | 5.16 | 5.14 | 5.14 | 5.21 | 5.32 | 5.40 | 5.45 |
 
-ChunkLlama3-8b achieves 100% retrieval accuracy across all document depths. Our few-shot results on the base model and zero-shot results on chat models show that ChunkLlama3-70b achieves performance on par with GPT-4 (2023/06/13) and Llama2 Long 70b.
+ChunkLlama3-8b achieves 100% retrieval accuracy across all document depths. Our few-shot results on the base model and zero-shot results on chat models show that ChunkLlama3-70b achieves performance on par with GPT-4 (2023/06/13) and Llama2 Long 70b ([Detailed results](https://github.com/HKUNLP/ChunkLlama/blob/main/README.md#chunkllama3)).
 
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. Based on our experiments on Llama2 7b, a single A100 can support inference with KV cache at **90k** (50k->90k) input, and 8 A100s can support inputs over 400k tokens. We also provide the monkey patch for the standard Llama2 model [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
 <p align="center" width="100%">
