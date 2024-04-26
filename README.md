@@ -226,7 +226,7 @@ Few-shot results on 4 research benchmarks:
 |--------|------|------|-------|-------|
 | ChunkLlama3-8b  | 27.4 | 30.5 | 52.6 | 15.4 | 
 | Llama2 Long-7b  | 21.9 | 27.8 | 43.2 | 14.9 | 
-| ChunkLlama3-70b | -- | -- | 75.4 | 16.0 | 
+| ChunkLlama3-70b | -- | 33.1 | 75.4 | 16.0 | 
 | Llama2 Long-70b | 30.9 | 35.7 | 79.7 | 16.5 | 
 
 Zero-shot results (with Chat models) on L-Eval:
