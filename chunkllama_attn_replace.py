@@ -98,17 +98,18 @@ def merge_attn_outputs(flash_results):
     flash_results = flash_results[1:]
     for flash_per_chunk in flash_results:
         attn_outputs = torch.stack([flash_attn_output[0] for flash_attn_output in flash_per_chunk])
-        logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk])
-        max_logits = torch.max(logits, dim=0).values  
-        stable_logits = logits - max_logits.unsqueeze(0)  
+        logits = torch.stack([flash_attn_output[1] for flash_attn_output in flash_per_chunk]).to(torch.float32)
+        max_logits = torch.max(logits, dim=0).values
+        stable_logits = logits - max_logits.unsqueeze(0)
 
         lse_s = torch.exp(stable_logits).detach()
         lse_sum = torch.sum(lse_s, dim=0)
         lse_s /= lse_sum
+        lse_s = lse_s.to(torch.bfloat16)
         attn_outputs *= lse_s.unsqueeze(-1)
         attn_outputs_all.append(attn_outputs.sum(dim=0))
     return torch.cat(attn_outputs_all, dim=2)
-
+    
 
 def do_flash_attn(query_states, key_states, value_states, causal=True):
     # flash_attention
