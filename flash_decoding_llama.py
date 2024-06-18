@@ -22,7 +22,6 @@ def do_flash_attn(query_states, key_states, value_states, causal=True):
 
 
 def do_flash_decoding(query_states, key_states, value_states, k_cache, v_cache, cache_seqlens):
-
     output = flash_attn_with_kvcache(query_states.transpose(1, 2), k_cache, v_cache,
                                                   key_states.transpose(1, 2),
                                                   value_states.transpose(1, 2), cache_seqlens=cache_seqlens)
@@ -68,15 +67,12 @@ def forward(
         key_cache[:, kv_seq_len - key_states.shape[-2]:kv_seq_len, :, :] = key_states.transpose(1, 2)
         value_cache[:, kv_seq_len - key_states.shape[-2]:kv_seq_len, :, :] = value_states.transpose(1, 2)
 
-    key_states = repeat_kv(key_states, self.num_key_value_groups)
-    value_states = repeat_kv(value_states, self.num_key_value_groups)
-
 
     if not has_kv_cache:
         attn_output =  do_flash_attn(query_states, key_states, value_states)
 
     else:
-        cache_seqlens = kv_seq_len
+        cache_seqlens = kv_seq_len-1
         attn_output = do_flash_decoding(query_states, key_states, value_states, key_cache, value_cache,
                           cache_seqlens=cache_seqlens)
 
@@ -152,7 +148,8 @@ def LlamaModel_forward(
 
     if use_cache and past_key_values is None:
         num_kv_heads = self.config.num_key_value_heads
-        head_dim = self.config.hidden_size // num_kv_heads
+        num_attention_heads = self.config.num_attention_heads
+        head_dim = self.config.hidden_size // num_attention_heads
         past_key_values = allocate_inference_cache(
             batch_size,
             MAX_CACHE_LEN,
