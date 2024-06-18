@@ -241,11 +241,13 @@ def apply_rotary_pos_emb(x, cos, sin, position_ids):
 
 
 def _merge_single_chunk(softmax_lse, attn_outputs):
+    softmax_lse = softmax_lse.to(torch.float32)
     max_softmax_sum = torch.max(softmax_lse, dim=0).values
     stable_softmax_sum = softmax_lse - max_softmax_sum.unsqueeze(0)
     lse_s = torch.exp(stable_softmax_sum).detach()
     lse_sum = torch.sum(lse_s, dim=0)
     lse_s /= lse_sum
+    lse_s = lse_s.to(torch.bfloat16)
     attn_outputs *= lse_s.unsqueeze(-1)
     return attn_outputs.sum(dim=0)
 
@@ -265,6 +267,7 @@ def merge_attn_outputs(flash_results, decoding=False):
 
 
 def do_flash_attn(query_states, key_states, value_states, causal=True, layer_idx=0):
+
     output, softmax_lse, _ = flash_attn_func(query_states.transpose(1, 2), key_states.transpose(1, 2),
                                              value_states.transpose(1, 2), causal=causal, return_attn_probs=True)
 
@@ -272,15 +275,16 @@ def do_flash_attn(query_states, key_states, value_states, causal=True, layer_idx
 
 
 def do_flash_decoding(query_states, key_states, value_states, k_cache, v_cache, cache_seqlens, intra=False):
-    # flash_attention
+    
     if not intra:
         temp = torch.zeros_like(k_cache[:, 0:1, :, :])
         k_cache = torch.cat([k_cache, temp], dim=1)
         v_cache = torch.cat([v_cache, temp], dim=1)
-
-    output, softmax_lse = new_flash_attn_with_kvcache(query_states.transpose(1, 2), k_cache, v_cache,
-                                                  key_states.transpose(1, 2),
-                                                  value_states.transpose(1, 2), cache_seqlens=cache_seqlens)
+        output, softmax_lse = new_flash_attn_with_kvcache(query_states.transpose(1, 2), k_cache, v_cache, cache_seqlens=cache_seqlens)
+    else:
+        output, softmax_lse = new_flash_attn_with_kvcache(query_states.transpose(1, 2), k_cache, v_cache,
+                                                    key_states.transpose(1, 2),
+                                                    value_states.transpose(1, 2), cache_seqlens=cache_seqlens)
     return output.transpose(1, 2), softmax_lse
 
 
@@ -324,12 +328,10 @@ def forward(
     key_cache = past_key_value[0][:, :, 0, :, :]
     value_cache = past_key_value[0][:, :, 1, :, :]
 
+
     if not has_kv_cache:
         key_cache[:, kv_seq_len - key_states.shape[-2]:kv_seq_len, :, :] = key_states.transpose(1, 2)
         value_cache[:, kv_seq_len - key_states.shape[-2]:kv_seq_len, :, :] = value_states.transpose(1, 2)
-
-    key_states = repeat_kv(key_states, self.num_key_value_groups)
-    value_states = repeat_kv(value_states, self.num_key_value_groups)
 
     flash_results = []
 
@@ -390,7 +392,7 @@ def forward(
             cache_seqlens = v_cache_succ.size(1)
 
             flash_results.append(
-                do_flash_decoding(q_states_succ, key_states, value_states, k_cache_succ, v_cache_succ,
+                do_flash_decoding(q_states_succ, None, None, k_cache_succ, v_cache_succ,
                                   cache_seqlens=cache_seqlens, intra=False))
 
         if chunk_num_curr >= 2:
@@ -400,8 +402,9 @@ def forward(
             v_cache_inter = value_cache[:, :chunk_len * (chunk_num_curr - 1), :, :]
             cache_seqlens = v_cache_inter.size(1)
             flash_results.append(
-                do_flash_decoding(q_states_inter, key_states, value_states, k_cache_inter, v_cache_inter,
+                do_flash_decoding(q_states_inter, None, None, k_cache_inter, v_cache_inter,
                                   cache_seqlens=cache_seqlens, intra=False))
+
         attn_output = merge_attn_outputs(flash_results, True)
 
     attn_output = attn_output.transpose(1, 2).contiguous()
@@ -421,6 +424,8 @@ def allocate_inference_cache(
 ):
     assert dtype in [torch.float16, torch.bfloat16, torch.float32]
     kv_cache_shape = (max_batch_size, max_seqlen, 2, nheads, headdim)
+    # print(max_batch_size)
+    # input()
     allc_kv_cache = {i: {0:torch.empty(kv_cache_shape, device=layer.self_attn.k_proj.weight.device, dtype=dtype), "cache_seqlens":torch.tensor([0],  device=layer.self_attn.k_proj.weight.device).long()} for
                      i, layer in enumerate(layers)}
 
@@ -474,7 +479,8 @@ def LlamaModel_forward(
 
     if use_cache and past_key_values is None:
         num_kv_heads = self.config.num_key_value_heads
-        head_dim = self.config.hidden_size // num_kv_heads
+        num_attention_heads = self.config.num_attention_heads
+        head_dim = self.config.hidden_size // num_attention_heads
         past_key_values = allocate_inference_cache(
             batch_size,
             MAX_CACHE_LEN,
