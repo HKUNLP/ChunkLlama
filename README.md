@@ -37,8 +37,8 @@ ChunkLlama3-8b achieves 100% retrieval accuracy across all document depths. Our 
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
 ```
 # `transformers==4.37.2`
-from chunkllama_attn_replace import replace_with_chunkllama 
-# flash decoding: from flash_decoding_chunkllama import replace_with_chunkllama
+flash_decoding_chunkllama import replace_with_chunkllama
+# disable flash decoding: from chunkllama_attn_replace import replace_with_chunkllama 
 replace_with_chunkllama(pretraining_length=4096) # pretraining_length=8192 if you are using Llama3
 ```
 For other foundation models:
@@ -51,12 +51,11 @@ replace_with_chunkmixtral(pretraining_length=32384) # Mixtral MOE model
 replace_with_chunkqwen(pretraining_length=32384) # Qwen 1.5
 ```
 
-
 #### Full inference code
 ```bash
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from chunkllama_attn_replace import replace_with_chunkllama
-# or from flash_decoding_chunkllama  import replace_with_chunkllama
+from flash_decoding_chunkllama import replace_with_chunkllama
+# disable flash decoding: from chunkllama_attn_replace import replace_with_chunkllama
 
 ##### add this line #####
 replace_with_chunkllama(pretraining_length=4096)
