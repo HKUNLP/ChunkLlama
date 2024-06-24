@@ -15,7 +15,11 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama-2/3 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates
-* We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. A single 80G A100 GPU can support inference with KV cache at **90k** input for Llama2 7B, and **160k** for Llama3 8B. Flash decoding for the standard attention model are also available [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py)
+* We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. A single 80G A100 GPU can support inference with KV cache at **90k** input for Llama2 7B, and **160k** for Llama3 8B. Flash decoding for the standard attention model are also available [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py).
+```
+from flash_decoding_llama import replace_with_flashdecoding
+replace_with_flashdecoding(max_prompt_length) # max_prompt_length is the maximum input length, e.g. 131072
+```
 
 * We add results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
 
