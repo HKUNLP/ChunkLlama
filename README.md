@@ -17,6 +17,7 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 ### Updates
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. A single 80G A100 GPU can support inference with KV cache at **90k** input for Llama2 7B, and **160k** for Llama3 8B. Flash decoding for the standard attention model are also available [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py).
 ```
+(Usage for standard self-attention)
 from flash_decoding_llama import replace_with_flashdecoding
 replace_with_flashdecoding(max_prompt_length) # max_prompt_length is the maximum input length, e.g. 131072
 ```
