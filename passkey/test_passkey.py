@@ -66,24 +66,13 @@ def passkey_retrieval_test(model, tokenizer, use_cache=False, n_garbage=60000, s
 
 def main(args):
     tokenizer = transformers.AutoTokenizer.from_pretrained(model_path)
-
     if "70b" != args.scale:
-        from accelerate import init_empty_weights, load_checkpoint_and_dispatch
-
-        with init_empty_weights():
-            model = LlamaForCausalLM.from_pretrained(model_path,
-                                                     trust_remote_code=True, torch_dtype=torch.bfloat16)
-        model.tie_weights()
-        model = load_checkpoint_and_dispatch(model, checkpoint=model_path,
-                                             device_map='auto',
-                                             offload_folder="./offload",
-                                             no_split_module_classes=["LlamaDecoderLayer"],
-                                             offload_state_dict=True, dtype=torch.bfloat16)
+        device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
+        model = LlamaForCausalLM.from_pretrained(model_path, trust_remote_code=True, torch_dtype=torch.bfloat16).to(
+            device)
     else:
-        model = LlamaForCausalLM.from_pretrained(
-            model_path,
-            torch_dtype=torch.bfloat16,
-        ).to(args.gpu)
+        model = LlamaForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", device_map="auto",
+                                                        trust_remote_code=True, torch_dtype=torch.bfloat16)
 
     all_accuries = {}
     # This is a rough ratio to control the number of texts and tokens
