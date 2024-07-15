@@ -51,9 +51,9 @@ For other foundation models:
 from chunkllama_attn_replace import replace_with_chunkmistral, replace_with_chunkmixtral
 from chunkqwen_attn_replace import replace_with_chunkqwen
 
-replace_with_chunkmistral(pretraining_length=32384) # Mistral-v0.2
-replace_with_chunkmixtral(pretraining_length=32384) # Mixtral MOE model
-replace_with_chunkqwen(pretraining_length=32384) # Qwen 1.5
+replace_with_chunkmistral(pretraining_length=32768) # Mistral-v0.2
+replace_with_chunkmixtral(pretraining_length=32768) # Mixtral MOE model
+replace_with_chunkqwen(pretraining_length=32768) # Qwen 1.5
 ```
 
 #### Full inference code
