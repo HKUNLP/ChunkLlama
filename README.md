@@ -21,6 +21,7 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 from flash_decoding_llama import replace_with_flashdecoding
 replace_with_flashdecoding(max_prompt_length) # max_prompt_length is the maximum input length, e.g. 131072
 ```
+we suggest using `flash_attn >=2.5.3,<2.6.0`
 
 * We add results for ChunkLlama3. Llama3, which uses 8k pretraining contexts, has the same architecture as Llama2, so there is no need to change the code. Here are the language modeling results on *PG19*:
 
