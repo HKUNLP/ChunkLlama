@@ -15,6 +15,42 @@ Dual chunk attention is a training-free and effective method for extending the c
 Due to the high cost of continual pretraining on longer sequences, previously released long-context models are typically limited to scales of 7B/13B. We demonstrate that by applying DCA to [Llama-2/3 70B](https://huggingface.co/meta-llama/Llama-2-70b-chat-hf), the model exhibits surprising extrapolation capabilities (100k context length) and a very strong understanding of practical long-context tasks.
 
 ### Updates
+* We support [vLLM](https://github.com/vllm-project/vllm) inference for Qwen-2 and Llama-2/3. Great thanks to my collaborator[@Fei Huang](https://scholar.google.com.hk/citations?user=7udAEzMAAAAJ&hl=en).
+```
+# step 0: Editable Install
+cd vllm & pip install -e .
+
+# step1: Modify the config.json file for your model by adding:
+"max_position_embeddings": 131072, // extrapolation length
+"dual_chunk_attention_config": {
+    "chunk_size": 8192, // training length (32768 for qwen2)
+    "local_size": 512,
+    "original_max_position_embeddings": 8192 // training length
+ }
+
+# step2: VLLM inference
+from vllm import LLM, SamplingParams
+
+model_path = "/path/to/llama3-8b-instruct" 
+llm = LLM(model=model_path, tensor_parallel_size=1, enforce_eager=True, enable_chunked_prefill=False, max_num_batched_tokens=131072)
+
+passkey_1  = "123456"
+passkey_2  = "654321"
+prompt1 = f"There is an important info hidden inside a lot of irrelevant text. Find it and memorize them. I will quiz you about the important information there.\n\nThe pass key is {passkey_1}. Remember it. {passkey_1} is the pass key.\n " + \
+    "The grass is green. The sky is blue. The sun is yellow. Here we go. There and back again. " * 4000 + \
+    "\nWhat is the pass key?\nThe passkey is " # The prompt is 100k long. You can try longer prompt by increasing the length.
+prompt2 = prompt1.replace(passkey_1, passkey_2)
+prompts = [f"{prompt1}", f"{prompt2}"]
+
+sampling_params = SamplingParams(top_p=0.8, temperature=0.7, repetition_penalty=1.05, top_k=10, max_tokens=100)
+outputs = llm.generate(prompts, sampling_params)
+
+# Print the outputs.
+for output in outputs:
+    prompt = output.prompt
+    generated_text = output.outputs[0].text
+    print(f"Generated text: {generated_text!r}")
+```
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. A single 80G A100 GPU can support inference with KV cache at **90k** input for Llama2 7B, and **160k** for Llama3 8B. Flash decoding for the standard attention model are also available [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py).
 ```
 (Usage for standard self-attention)
