@@ -111,8 +111,9 @@ replace_with_chunkllama(pretraining_length=4096)
 tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf", trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf", attn_implementation="flash_attention_2", trust_remote_code=True, torch_dtype=torch.bfloat16)
 inputs = tokenizer("Long...docs\n Q: How to extend the context window of LLMs? ", return_tensors="pt")
-output_ids = model.generate(**inputs, max_length=128)[0]
-print(tokenizer.decode(output_ids))
+prompt_length = inputs.input_ids.size()[-1]
+output_ids = model.generate(**inputs, max_new_tokens=64)[0]
+print(tokenizer.decode(output_ids)[prompt_length:])
 ```
 #### Chat with a lengthy PDF file
 We have provided a collection of influential papers on long-context scaling of LLMs in the `Popular_PDFs` directory. By using the `--pdf` parameter, you can access the latest advancements in this field through ChunkLlama⭐.
