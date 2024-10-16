@@ -16,17 +16,23 @@ Due to the high cost of continual pretraining on longer sequences, previously re
 
 ### Updates
 * We support [vLLM](https://github.com/vllm-project/vllm) inference for Qwen-2 and Llama-2/3. Great thanks to my collaborator[@Fei Huang](https://scholar.google.com.hk/citations?user=7udAEzMAAAAJ&hl=en).
-```
-# step 0: Editable Install
+```python
+# step 0: Editable installation
 cd vllm & pip install -e .
 
 # step1: Modify the config.json file for your model by adding:
-"max_position_embeddings": 131072, // extrapolation length
-"dual_chunk_attention_config": {
-    "chunk_size": 8192, // training length (32768 for qwen2)
-    "local_size": 512,
-    "original_max_position_embeddings": 8192 // training length
- }
+{
+    "architectures": [
+        "LlamaForCausalLM"
+    ],
+    // ...
+    "max_position_embeddings": 131072, // extrapolation length
+    "dual_chunk_attention_config": {
+        "chunk_size": 8192, // training length (32768 for qwen2)
+        "local_size": 512,
+        "original_max_position_embeddings": 8192 // training length
+     }
+}
 
 # step2: VLLM inference
 from vllm import LLM, SamplingParams
@@ -52,7 +58,7 @@ for output in outputs:
     print(f"Generated text: {generated_text!r}")
 ```
 * We add [Flash Decoding](https://pytorch.org/blog/flash-decoding) for efficient inference with KV cache. A single 80G A100 GPU can support inference with KV cache at **90k** input for Llama2 7B, and **160k** for Llama3 8B. Flash decoding for the standard attention model are also available [here](https://github.com/HKUNLP/ChunkLlama/blob/main/flash_decoding_llama.py).
-```
+```python
 (Usage for standard self-attention)
 from flash_decoding_llama import replace_with_flashdecoding
 replace_with_flashdecoding(max_prompt_length) # max_prompt_length is the maximum input length, e.g. 131072
@@ -77,14 +83,14 @@ ChunkLlama3-8b achieves 100% retrieval accuracy across all document depths. Our 
 
 ### 🚀Quick Start
 As a training-free method, only one line needs to be added to your original inference code for the Llama2 model:
-```
+```python
 # `transformers==4.37.2`
 from chunkllama_attn_replace import replace_with_chunkllama 
 # flash decoding: flash_decoding_chunkllama import replace_with_chunkllama
 replace_with_chunkllama(pretraining_length=4096) # pretraining_length=8192 if you are using Llama3
 ```
 For other foundation models:
-```bash
+```python
 from chunkllama_attn_replace import replace_with_chunkmistral, replace_with_chunkmixtral
 from chunkqwen_attn_replace import replace_with_chunkqwen
 
@@ -94,7 +100,7 @@ replace_with_chunkqwen(pretraining_length=32768) # Qwen 1.5
 ```
 
 #### Full inference code
-```bash
+```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from flash_decoding_chunkllama import replace_with_chunkllama
 # flash decoding: from chunkllama_attn_replace import replace_with_chunkllama
@@ -117,11 +123,12 @@ All of these papers are released recently and are impossible to be used during p
 
 
 ### Usage Requirements
-1. Prepare the environment. 
+1. Prepare the environment for transformers+flash-attention2. 
 ```bash
 pip install -r requirements.txt
 pip install flash-attn --no-build-isolation (FlashAttention >= 2.5.0)
 ```
+
 2. Download the pretraining weights (Extended ctx means the context length enabled by DCA).
 
 | Supported Models                                                                  | Extended ctx |
